@@ -81,6 +81,4 @@ While it aims to provide accurate classifications,
 Always use caution when dealing with unknown messages. 
 """)
 
-# Footer
-st.markdown("---")
-st.write("Made with ❤️ by YourName")
+
