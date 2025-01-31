@@ -3,14 +3,23 @@ import torch
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 import gdown
 import os
+import zipfile
 
-# Download model from Google Drive if not already available
+# Function to download file from Google Drive
+def download_file_from_google_drive(url, destination):
+    gdown.download(url, destination, quiet=False)
+
+# Directory and URL for the model
 model_dir = "distilbert_spam_model"
-model_url = "https://drive.google.com/drive/folders/1KhfpYUtqnRr25CIAbLWrZf8hiKC_LUNQ?usp=sharing"  # Replace with actual file ID
+model_url = "https://drive.google.com/uc?export=download&id=1KhfpYUtqnRr25CIAbLWrZf8hiKC_LUNQ"  # Direct download link
 
+# Download and extract model if not already available
 if not os.path.exists(model_dir):
     os.makedirs(model_dir)
-    gdown.download(model_url, os.path.join(model_dir, "model.safetensors"), quiet=False)
+    model_path = os.path.join(model_dir, "model.zip")
+    download_file_from_google_drive(model_url, model_path)
+    with zipfile.ZipFile(model_path, 'r') as zip_ref:
+        zip_ref.extractall(model_dir)
 
 # Load the model and tokenizer
 tokenizer = DistilBertTokenizer.from_pretrained(model_dir)
