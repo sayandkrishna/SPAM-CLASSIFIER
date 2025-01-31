@@ -81,4 +81,4 @@ While it aims to provide accurate classifications,
 Always use caution when dealing with unknown messages. 
 """)
 
-
+st.markdown("---")
