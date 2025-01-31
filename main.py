@@ -6,34 +6,19 @@ import os
 
 # List the file IDs of the necessary files in your Google Drive folder
 file_ids = {
-    "config.json": "1R7cJg2_iPemfmVzTMqOQMEo7Omlvvzte",  # Replace with actual file ID for config.json
-    "model.safetensors": "12AgOktT6CYIi6a6bAobcdVJrkwTBey0Z",  # Replace with actual file ID for model.safetensors
-    "special_tokens_map.json": "1A91zZ8H3J_RNcx67mQQeSt0uVkUoeySC",  # Replace with actual file ID
-    "tokenizer_config.json": "1OQe5Kv050_5KReoZYac3lwsq5N1CSXxW",  # Replace with actual file ID
-    "vocab.txt": "1VmjF3i9qvPUEDZOLmQ9vYuc69vQoB1Ie"  # Replace with actual file ID for vocab.txt
+    "config.json": "1R7cJg2_iPemfmVzTMqOQMEo7Omlvvzte",
+    "model.safetensors": "12AgOktT6CYIi6a6bAobcdVJrkwTBey0Z",
+    "special_tokens_map.json": "1A91zZ8H3J_RNcx67mQQeSt0uVkUoeySC",
+    "tokenizer_config.json": "1OQe5Kv050_5KReoZYac3lwsq5N1CSXxW",
+    "vocab.txt": "1VmjF3i9qvPUEDZOLmQ9vYuc69vQoB1Ie"
 }
 
 model_dir = "distilbert_spam_model"
 
-# Create the directory if it doesn't exist
-if not os.path.exists(model_dir):
-    os.makedirs(model_dir)
-
-# Download each file using its file ID
-for file_name, file_id in file_ids.items():
+# Function to download files from Google Drive
+def download_file(file_id, destination):
     file_url = f"https://drive.google.com/uc?id={file_id}"
-    gdown.download(file_url, os.path.join(model_dir, file_name), quiet=False)
-
-# Load the model and tokenizer
-tokenizer = DistilBertTokenizer.from_pretrained(model_dir)
-model = DistilBertForSequenceClassification.from_pretrained(model_dir)
-
-# Function to classify spam or not
-def classify_spam(text):
-    inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True)
-    outputs = model(**inputs)
-    prediction = torch.argmax(outputs.logits, dim=1).item()
-    return "Spam" if prediction == 1 else "Not Spam"
+    gdown.download(file_url, destination, quiet=False)
 
 # Streamlit UI
 st.set_page_config(page_title="Cybersecurity Spam Checker", layout="wide")
@@ -46,6 +31,26 @@ st.sidebar.write("Use this tool to classify messages as spam or not.")
 # Main title
 st.title("Cybersecurity Spam Checker")
 st.write("### Enter a message to classify whether it is spam or not.")
+
+# Check if model files are already downloaded
+if not os.path.exists(model_dir):
+    os.makedirs(model_dir)
+
+    # Download each file using its file ID
+    for file_name, file_id in file_ids.items():
+        file_path = os.path.join(model_dir, file_name)
+        download_file(file_id, file_path)
+
+# Load the model and tokenizer
+tokenizer = DistilBertTokenizer.from_pretrained(model_dir)
+model = DistilBertForSequenceClassification.from_pretrained(model_dir)
+
+# Function to classify spam or not
+def classify_spam(text):
+    inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True)
+    outputs = model(**inputs)
+    prediction = torch.argmax(outputs.logits, dim=1).item()
+    return "Spam" if prediction == 1 else "Not Spam"
 
 # Text input for the message
 user_input = st.text_area("Message", height=150)
