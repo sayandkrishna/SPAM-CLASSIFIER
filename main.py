@@ -15,9 +15,10 @@ file_ids = {
 
 model_dir = "distilbert_spam_model"
 
-# Function to download files from Google Drive
+# Function to download files using direct Google Drive download URL
 def download_file(file_id, destination):
-    file_url = f"https://drive.google.com/uc?id={file_id}"
+    # Construct the URL for direct download
+    file_url = f"https://drive.google.com/uc?export=download&id={file_id}"
     gdown.download(file_url, destination, quiet=False)
 
 # Streamlit UI
