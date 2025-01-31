@@ -3,23 +3,26 @@ import torch
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 import gdown
 import os
-import zipfile
 
-# Function to download file from Google Drive
-def download_file_from_google_drive(url, destination):
-    gdown.download(url, destination, quiet=False)
+# List the file IDs of the necessary files in your Google Drive folder
+file_ids = {
+    "config.json": "1R7cJg2_iPemfmVzTMqOQMEo7Omlvvzte",  # Replace with actual file ID for config.json
+    "model.safetensors": "12AgOktT6CYIi6a6bAobcdVJrkwTBey0Z",  # Replace with actual file ID for model.safetensors
+    "special_tokens_map.json": "1A91zZ8H3J_RNcx67mQQeSt0uVkUoeySC",  # Replace with actual file ID
+    "tokenizer_config.json": "1OQe5Kv050_5KReoZYac3lwsq5N1CSXxW",  # Replace with actual file ID
+    "vocab.txt": "1VmjF3i9qvPUEDZOLmQ9vYuc69vQoB1Ie"  # Replace with actual file ID for vocab.txt
+}
 
-# Directory and URL for the model
 model_dir = "distilbert_spam_model"
-model_url = "https://drive.google.com/uc?export=download&id=1KhfpYUtqnRr25CIAbLWrZf8hiKC_LUNQ"  # Direct download link
 
-# Download and extract model if not already available
+# Create the directory if it doesn't exist
 if not os.path.exists(model_dir):
     os.makedirs(model_dir)
-    model_path = os.path.join(model_dir, "model.zip")
-    download_file_from_google_drive(model_url, model_path)
-    with zipfile.ZipFile(model_path, 'r') as zip_ref:
-        zip_ref.extractall(model_dir)
+
+# Download each file using its file ID
+for file_name, file_id in file_ids.items():
+    file_url = f"https://drive.google.com/uc?id={file_id}"
+    gdown.download(file_url, os.path.join(model_dir, file_name), quiet=False)
 
 # Load the model and tokenizer
 tokenizer = DistilBertTokenizer.from_pretrained(model_dir)
@@ -58,24 +61,24 @@ if st.button("Classify"):
 # Additional information section
 st.markdown("---")
 st.subheader("About This Tool")
-st.write("""
+st.write(""" 
 This tool uses a DistilBERT model to classify messages as spam or not. 
 Spam messages can be harmful and may contain phishing attempts or unwanted advertisements. 
 By using this tool, you can help protect yourself from potential threats.
 """)
 
 st.subheader("How It Works")
-st.write("""
-1. Enter a message in the text area above.
-2. Click the "Classify" button.
-3. The model will analyze the message and provide a prediction.
+st.write(""" 
+1. Enter a message in the text area above. 
+2. Click the "Classify" button. 
+3. The model will analyze the message and provide a prediction. 
 """)
 
 st.subheader("Disclaimer")
-st.write("""
+st.write(""" 
 This tool is for educational purposes only. 
 While it aims to provide accurate classifications, 
-Always use caution when dealing with unknown messages.
+Always use caution when dealing with unknown messages. 
 """)
 
 # Footer
